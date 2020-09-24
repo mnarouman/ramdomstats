@@ -1,0 +1,6 @@
+Exemple de lecture des statistiques avec le numéro 22 :
+
+Le numéro 22 n'est pas sorti depuis 5 tirages, 
+il a un écart moyen récent de 14.00 sur ses 20 dernières sorties. 
+Il est sorti 117 fois depuis la création du jeu, et s'est fait attendre au maximum pendant 58 tirages. 
+Le numéro 22 est sorti 1 fois durant les 10 derniers tirages et 2 fois sur les 30 derniers.
