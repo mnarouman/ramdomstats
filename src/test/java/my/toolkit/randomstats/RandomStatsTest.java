@@ -1,0 +1,363 @@
+package my.toolkit.randomstats;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.BiPredicate;
+import java.util.stream.Collectors;
+
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
+import lombok.extern.slf4j.Slf4j;
+import my.toolkit.randomstats.domain.EuroMillionsBean;
+import my.toolkit.randomstats.domain.EuroMillionsPronosticsBean;
+import my.toolkit.randomstats.domain.EuroMillionsStatsBean;
+import my.toolkit.randomstats.services.RandomStatsServices;
+import my.toolkit.randomstats.utils.RandomStatsUtils;
+@Slf4j
+@SpringBootTest
+public class RandomStatsTest {
+	private static final String CSV_EUROMILLIONS_2020_09_18 = "csv/euromillions-2020-09-18.csv";
+	private static final String CSV_EUROMILLIONS_2020_09_22 = "csv/euromillions-2020-09-22.csv";
+	private static final String CSV_EUROMILLIONS = "csv/euromillions.csv";
+	private List<EuroMillionsBean> beans;
+	private List<EuroMillionsBean> beans20200922;
+	
+	private BiPredicate<Integer, EuroMillionsBean> isNumberOut = RandomStatsUtils.getIsNumberOut();
+	private BiPredicate<Integer, EuroMillionsBean> isStarOut = RandomStatsUtils.getIsStarOut();
+			
+	
+	@Autowired
+	private RandomStatsServices services;
+	
+	@BeforeEach
+	public void init() {
+		beans = services.loadBean(CSV_EUROMILLIONS);
+		beans20200922 = services.loadBean(CSV_EUROMILLIONS_2020_09_22);
+		log.debug("************ Number of draws :" + beans.size() );
+
+	}
+	
+	@Test
+	public void loadBeans() throws Exception {
+		// given
+		String csvFileName = CSV_EUROMILLIONS_2020_09_22;
+
+		// when
+		List<EuroMillionsBean> csvFile = services.loadBean(csvFileName);
+
+		// then
+		Assertions.assertThat(csvFile).isNotNull();
+		Assertions.assertThat(csvFile.size()).isEqualTo(1357);
+		
+	}
+	
+	/**
+	 * number of lottery draws where the number is not out
+	 * @throws Exception
+	 */
+	@Test
+	public void lastWinningDrawFor22() throws Exception {
+		// given
+		int number = 22;
+		
+		// when
+		long actualDeviation = services.lastWinningDraw(beans20200922, number, isNumberOut);
+
+		// then
+		Assertions.assertThat(actualDeviation).isEqualTo(5);
+		
+	}
+	
+	/**
+	 * Recent average deviation over its last 20 outings.
+	 * @throws Exception
+	 */
+	@Test
+	public void winningDrawAverageFor22() throws Exception {
+		// given
+		int number = 22;
+		int nbDraws = 20;
+		
+		// when
+		float ponctualDeviation = services.winningDrawAverage(beans, number, nbDraws, isNumberOut);
+
+		// then
+		Assertions.assertThat(ponctualDeviation).isEqualTo(14.25f);
+		
+	}
+	
+	/**
+	 * Recent average deviation over its last 20 outings.
+	 * @throws Exception
+	 */
+	@Test
+	public void winningDrawAverageFor23() throws Exception {
+		// given
+		int number = 23;
+		int nbDraws = 20;
+		
+		// when
+		float ponctualDeviation = services.winningDrawAverage(beans, number, nbDraws, isNumberOut);
+
+		// then
+		Assertions.assertThat(ponctualDeviation).isEqualTo(7.75f);
+		
+	}
+	
+	/**
+	 * number of times the number is output
+	 * @throws Exception
+	 */
+	@Test
+	public void numberOfTimesWinning() throws Exception {
+		// given
+		int number = 22;
+		
+		// when
+		long outputWinner = services.numberOfTimesWinning(beans, number, isNumberOut);
+		
+		// then
+		Assertions.assertThat(outputWinner).isEqualTo(116);
+		
+	}
+	
+	/**
+	 * Output frequency
+	 * @throws Exception
+	 */
+	@Test
+	public void outputFrequency() throws Exception {
+		// given
+		int number = 22;
+		
+		// when
+		float outputFrequency = services.outputFrequency(beans, number, isNumberOut);
+
+		// then
+		Assertions.assertThat(String.format("%.2f", outputFrequency)).isEqualTo("0,09");
+		
+	}
+	
+	/**
+	 * Maximum number of draws during which the number was delayed
+	 * @throws Exception
+	 */
+	@Test
+	public void maximumBeforeWinningDrawFor22() throws Exception {
+		// given
+		int number = 22;
+		
+		// when
+		int maxDeviation = services.maxBeforeWinningDraw(beans, number, isNumberOut);
+
+		// then
+		Assertions.assertThat(maxDeviation).isEqualTo(58);
+		
+	}
+	
+	@Test
+	public void maximumBeforeWinningDrawFor43() throws Exception {
+		// given
+		int number = 43;
+		
+		// when
+		int maxDeviation = services.maxBeforeWinningDraw(beans, number, isNumberOut);
+
+		// then
+		Assertions.assertThat(maxDeviation).isEqualTo(76);
+		
+	}
+
+	/**
+	 * number of times the number appeared on the last 10 draws
+	 * @throws Exception
+	 */
+	@Test
+	public void recentAppearances() throws Exception {
+		// given
+		int number = 22;
+		int numberOfDraws = 10;
+		
+		// when
+		int appearances = services.numberOfTimesWinningOnNDraws(beans, number, numberOfDraws, isNumberOut);
+
+		// then
+		Assertions.assertThat(appearances).isEqualTo(1);
+		
+	}
+	
+	/**
+	 * number of times the number appeared on the last 30 draws
+	 * @throws Exception
+	 */
+	@Test
+	public void generalAppearances() throws Exception {
+		// given
+		int number = 22;
+		int numberOfDraws = 30;
+		
+		// when
+		int appearances = services.numberOfTimesWinningOnNDraws(beans, number, numberOfDraws, isNumberOut);
+
+		// then
+		Assertions.assertThat(appearances).isEqualTo(2);
+		
+	}
+	
+	/**
+	 * number of times the number appeared on the last 30 draws
+	 * @throws Exception
+	 */
+	@Test
+	public void generalAppearancesForStar2() throws Exception {
+		// given
+		int number = 2;
+		int numberOfDraws = 30;
+		
+		// when
+		int appearances = services.numberOfTimesWinningOnNDraws(beans, number, numberOfDraws, isStarOut);
+
+		// then
+		Assertions.assertThat(appearances).isEqualTo(7);
+		
+	}
+	
+	/**
+	 * number of times the number appeared on the last 30 draws
+	 * @throws Exception
+	 */
+	@Test
+	public void getstatsForNumber22() throws Exception {
+		// given
+		int number = 22;
+		
+		// when
+		EuroMillionsStatsBean stats = services.statistics(beans, number, isNumberOut, false);
+
+		// then
+		Assertions.assertThat(stats.getNumber()).isEqualTo(22);
+		Assertions.assertThat(stats.getLastWinningDraw()).isEqualTo(5);
+		Assertions.assertThat(stats.getWinningDrawAverage()).isEqualTo(14.25f);
+		Assertions.assertThat(stats.getNumberOfTimesWinning()).isEqualTo(116);	
+		Assertions.assertThat(String.format("%.2f", stats.getOutputFrequency())).isEqualTo("0,09");
+		Assertions.assertThat(stats.getMaxBeforeWinningDraw()).isEqualTo(58);
+		Assertions.assertThat(stats.getNumberOfTimesWinningOn10Draws()).isEqualTo(1);
+		Assertions.assertThat(stats.getNumberOfTimesWinningOn30Draws()).isEqualTo(2);
+	}
+	
+	/**
+	 * number of times the number appeared on the last 30 draws
+	 * @throws Exception
+	 */
+	@Test
+	public void getstatsForNumber10() throws Exception {
+		// given
+		int number = 10;
+		
+		// when
+		EuroMillionsStatsBean stats = services.statistics(beans, number, isNumberOut, false);
+
+		// then
+		Assertions.assertThat(stats.getNumber()).isEqualTo(10);
+		Assertions.assertThat(stats.getLastWinningDraw()).isEqualTo(1);
+		Assertions.assertThat(stats.getWinningDrawAverage()).isEqualTo(9.65f);
+		Assertions.assertThat(stats.getNumberOfTimesWinning()).isEqualTo(146);	
+		Assertions.assertThat(String.format("%.2f", stats.getOutputFrequency())).isEqualTo("0,11");
+		Assertions.assertThat(stats.getMaxBeforeWinningDraw()).isEqualTo(39);
+		Assertions.assertThat(stats.getNumberOfTimesWinningOn10Draws()).isEqualTo(3);
+		Assertions.assertThat(stats.getNumberOfTimesWinningOn30Draws()).isEqualTo(5);
+	}
+	
+	/**
+	 * number of times the number appeared on the last 30 draws
+	 * @throws Exception
+	 */
+	@Test
+	public void getstatsForStar2() throws Exception {
+		// given
+		int star = 2;
+		
+		// when
+		EuroMillionsStatsBean stats = services.statistics(beans, star, isStarOut, true);
+
+		// then
+		Assertions.assertThat(stats.getNumber()).isEqualTo(2);
+		Assertions.assertThat(stats.getLastWinningDraw()).isEqualTo(15);
+		Assertions.assertThat(stats.getWinningDrawAverage()).isEqualTo(4.50f);
+		Assertions.assertThat(stats.getNumberOfTimesWinning()).isEqualTo(280);	
+		Assertions.assertThat(String.format("%.2f", stats.getOutputFrequency())).isEqualTo("0,21");
+		Assertions.assertThat(stats.getMaxBeforeWinningDraw()).isEqualTo(29);
+		Assertions.assertThat(stats.getNumberOfTimesWinningOn10Draws()).isEqualTo(0);
+		Assertions.assertThat(stats.getNumberOfTimesWinningOn30Draws()).isEqualTo(7);
+	}
+	
+	/**
+	 * number of times the number appeared on the last 30 draws
+	 * @throws Exception
+	 */
+	@Test
+	public void getstatsForStar10() throws Exception {
+		// given
+		int star = 10;
+		
+		// when
+		EuroMillionsStatsBean stats = services.statistics(beans, star, isStarOut, true);
+
+		// then
+		Assertions.assertThat(stats.getNumber()).isEqualTo(10);
+		Assertions.assertThat(stats.getLastWinningDraw()).isEqualTo(8);
+		Assertions.assertThat(stats.getWinningDrawAverage()).isEqualTo(7.10f);
+		Assertions.assertThat(stats.getNumberOfTimesWinning()).isEqualTo(179);	
+		Assertions.assertThat(String.format("%.2f", stats.getOutputFrequency())).isEqualTo("0,13");
+		Assertions.assertThat(stats.getMaxBeforeWinningDraw()).isEqualTo(29);
+		Assertions.assertThat(stats.getNumberOfTimesWinningOn10Draws()).isEqualTo(1);
+		Assertions.assertThat(stats.getNumberOfTimesWinningOn30Draws()).isEqualTo(5);
+	}
+	
+	@Test
+	public void allStats() {
+		List<EuroMillionsStatsBean> stats = RandomStatsUtils.allNumberStats(beans);
+		
+		System.out.println(stats);
+		List<EuroMillionsStatsBean> collect = stats.stream().sorted(Comparator.comparing(EuroMillionsStatsBean::getWinningDrawAverage)).collect(Collectors.toList());
+		collect.forEach(entry ->
+		System.out.println(String.format("Number : %s | Max Winning Draw Average : %s", entry.getNumber(),
+		entry.getWinningDrawAverage())));
+	}
+
+
+	@Test
+	public void pronostics() throws Exception {
+		//given
+		
+		//when
+		EuroMillionsPronosticsBean pronostics = services.pronostics(beans);
+		
+		//then
+		assertThat(pronostics.getAllStats()).isNotNull();
+		assertThat(pronostics.getAllStats().size()).isEqualTo(62);
+		System.out.println(pronostics);
+		
+//		LeastFrequentNumbers leastFrequentNumbers = euroMillionsPronosticsBean.getLeastFrequentNumbers();
+//		LessAnticipatedNumbers lessAnticipatedNumbers = euroMillionsPronosticsBean.getLessAnticipatedNumbers();
+//		MostAnticipatedNumbers mostAnticipatedNumbers = euroMillionsPronosticsBean.getMostAnticipatedNumbers();
+//		
+//		List<Integer>numbers =  leastFrequentNumbers.getNumbers();
+//		List<Integer>stars =  leastFrequentNumbers.getStars();
+//		
+//		numbers =  lessAnticipatedNumbers.getNumbers();
+//		stars =  lessAnticipatedNumbers.getStars();
+//		
+//		numbers =  mostAnticipatedNumbers.getNumbers();
+//		stars =  mostAnticipatedNumbers.getStars();
+		
+	}
+}

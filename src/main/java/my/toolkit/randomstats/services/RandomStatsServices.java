@@ -7,6 +7,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.function.BiPredicate;
 
 import org.springframework.stereotype.Service;
 
@@ -14,6 +15,8 @@ import com.opencsv.bean.CsvToBeanBuilder;
 
 import lombok.extern.slf4j.Slf4j;
 import my.toolkit.randomstats.domain.EuroMillionsBean;
+import my.toolkit.randomstats.domain.EuroMillionsPronosticsBean;
+import my.toolkit.randomstats.domain.EuroMillionsStatsBean;
 import my.toolkit.randomstats.exception.RandomStatsException;
 import my.toolkit.randomstats.utils.RandomStatsUtils;
 
@@ -50,40 +53,43 @@ public class RandomStatsServices {
 						ClassLoader.getSystemResource(csvFileName).toURI()
 					)
 			);
-		} catch (IOException e) {
+		} catch (IOException | URISyntaxException e) {
 			log.error("Unable to load '" + csvFileName + "'",  new RandomStatsException(e));
-		} catch (URISyntaxException e) {
-			log.error("Unable to load '" + csvFileName + "'",  new RandomStatsException(e));
-		}
+		} 
 		return reader;
 	}
 
-	public long actualDeviation(List<EuroMillionsBean> beans, int number) {
-		return RandomStatsUtils.actualDeviation(beans, number);
+	public long lastWinningDraw(List<EuroMillionsBean> beans, int number, BiPredicate<Integer, EuroMillionsBean> isOut) {
+		return RandomStatsUtils.lastWinningDraw(beans == null ? euroMillionsBeans : beans, number, isOut);
 	}
 
-	public float ponctualDeviation(List<EuroMillionsBean> beans, int number, int nbdraws) {
-		return RandomStatsUtils.ponctualDeviation(beans, number, nbdraws);
+	public float winningDrawAverage(List<EuroMillionsBean> beans, int number, int nbdraws, BiPredicate<Integer, EuroMillionsBean> isOut) {
+		return RandomStatsUtils.winningDrawAverage(beans == null ? euroMillionsBeans : beans, number, nbdraws, isOut);
 	}
 
-	public float outputFrequency(List<EuroMillionsBean> beans, int number) {
-		// TODO Auto-generated method stub
-		return 0;
+	public float outputFrequency(List<EuroMillionsBean> beans, int number, BiPredicate<Integer, EuroMillionsBean> isOut) {
+		return RandomStatsUtils.outputFrequency(beans == null ? euroMillionsBeans : beans, number, isOut);
 	}
 
-	public long outputWinner(List<EuroMillionsBean> beans, int number) {
-		
-		return RandomStatsUtils.filterDrawsWithNumber(beans, number);
+	public long numberOfTimesWinning(List<EuroMillionsBean> beans, int number, BiPredicate<Integer, EuroMillionsBean> isOut) {
+
+		return RandomStatsUtils.numberOfTimesWinning(beans == null ? euroMillionsBeans : beans, number, isOut);
 	}
 
-	public int maxDeviation(List<EuroMillionsBean> beans, int number) {
-		// TODO Auto-generated method stub
-		return 0;
+	public int maxBeforeWinningDraw(List<EuroMillionsBean> beans, int number, BiPredicate<Integer, EuroMillionsBean> isOut) {
+		return RandomStatsUtils.maxBeforeWinningDraw(beans == null ? euroMillionsBeans : beans, number, isOut);
 	}
 
-	public int appearances(List<EuroMillionsBean> beans, int number, int numberOfDraws) {
-		// TODO Auto-generated method stub
-		return 0;
+	public int numberOfTimesWinningOnNDraws(List<EuroMillionsBean> beans, int number, int numberOfDraws, BiPredicate<Integer, EuroMillionsBean> isOut) {
+		return RandomStatsUtils.numberOfTimesWinningOnNDraws(beans == null ? euroMillionsBeans : beans, number, numberOfDraws, isOut);
+	}
+
+	public EuroMillionsStatsBean statistics(List<EuroMillionsBean> beans, int number, BiPredicate<Integer, EuroMillionsBean> isOut, boolean isStar) {
+		return RandomStatsUtils.statistics(beans == null ? euroMillionsBeans : beans, number, isOut, isStar);
+	}
+
+	public EuroMillionsPronosticsBean pronostics(List<EuroMillionsBean> beans) {
+		return RandomStatsUtils.pronostics(beans == null ? euroMillionsBeans : beans);
 	}
 
 }

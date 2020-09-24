@@ -4,7 +4,7 @@ Statistiques détaillées pour chaque numéro Euromillion :
 Écart actuel		: nb tirages où le numéro n'est pas sortie
 Écart ponctuel		: écart moyen récent sur ses 20 dernières sorties.
 
-Sorties				: nb de fois sortie depuis la créaton
+Sorties				: nb de fois sortie depuis la création
 Fréquence de sortie	: nb de fois sorti sur nb tirage
 Écart max			: nb de tirage max pendant lequel  le numéro s'est fait attendre
 
