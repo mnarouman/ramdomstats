@@ -1,4 +1,4 @@
-package my.toolkit.randomstats;
+package my.toolkit.randomstats.domain;
 
 import java.util.List;
 

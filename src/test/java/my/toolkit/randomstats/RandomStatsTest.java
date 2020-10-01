@@ -4,8 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
@@ -33,6 +31,10 @@ public class RandomStatsTest {
 	private BiPredicate<Integer, EuroMillionsBean> isNumberOut = RandomStatsUtils.getIsNumberOut();
 	private BiPredicate<Integer, EuroMillionsBean> isStarOut = RandomStatsUtils.getIsStarOut();
 			
+	static {
+		System.setProperty("java.awt.headless", "false");
+		
+	}
 	
 	@Autowired
 	private RandomStatsServices services;

@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import my.toolkit.randomstats.domain.EuroMillionsBean;
 import my.toolkit.randomstats.domain.EuroMillionsPronosticsBean;
 import my.toolkit.randomstats.domain.EuroMillionsStatsBean;
-import my.toolkit.randomstats.domain.LeastFrequentNumbers;
 
 @UtilityClass
 @Slf4j
