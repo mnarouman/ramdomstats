@@ -2,9 +2,6 @@ package my.toolkit.randomstats.domain;
 
 import java.util.List;
 
-import lombok.Data;
-
-@Data
 public class EuroMillionsPronosticsBean {
 	private List<EuroMillionsStatsBean> allStats;
 	private LeastFrequentNumbers leastFrequentNumbers;
@@ -55,6 +52,56 @@ public class EuroMillionsPronosticsBean {
 		pronostics.append("\n");
 		
 		return pronostics.toString();
+	}
+
+
+	public List<EuroMillionsStatsBean> getAllStats() {
+		return allStats;
+	}
+
+
+	public void setAllStats(List<EuroMillionsStatsBean> allStats) {
+		this.allStats = allStats;
+	}
+
+
+	public LeastFrequentNumbers getLeastFrequentNumbers() {
+		return leastFrequentNumbers;
+	}
+
+
+	public void setLeastFrequentNumbers(LeastFrequentNumbers leastFrequentNumbers) {
+		this.leastFrequentNumbers = leastFrequentNumbers;
+	}
+
+
+	public LessAnticipatedNumbers getLessAnticipatedNumbers() {
+		return lessAnticipatedNumbers;
+	}
+
+
+	public void setLessAnticipatedNumbers(LessAnticipatedNumbers lessAnticipatedNumbers) {
+		this.lessAnticipatedNumbers = lessAnticipatedNumbers;
+	}
+
+
+	public MostAnticipatedNumbers getMostAnticipatedNumbers() {
+		return mostAnticipatedNumbers;
+	}
+
+
+	public void setMostAnticipatedNumbers(MostAnticipatedNumbers mostAnticipatedNumbers) {
+		this.mostAnticipatedNumbers = mostAnticipatedNumbers;
+	}
+
+
+	public int getNumberOfDraws() {
+		return numberOfDraws;
+	}
+
+
+	public void setNumberOfDraws(int numberOfDraws) {
+		this.numberOfDraws = numberOfDraws;
 	}
 
 	

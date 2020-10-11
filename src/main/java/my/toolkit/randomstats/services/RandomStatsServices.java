@@ -9,11 +9,12 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.function.BiPredicate;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.opencsv.bean.CsvToBeanBuilder;
 
-import lombok.extern.slf4j.Slf4j;
 import my.toolkit.randomstats.domain.EuroMillionsBean;
 import my.toolkit.randomstats.domain.EuroMillionsPronosticsBean;
 import my.toolkit.randomstats.domain.EuroMillionsStatsBean;
@@ -21,11 +22,10 @@ import my.toolkit.randomstats.exception.RandomStatsException;
 import my.toolkit.randomstats.utils.RandomStatsUtils;
 
 @Service
-@Slf4j
 public class RandomStatsServices {
 	private static final String CSV_EUROMILLIONS = "csv/euromillions.csv";
 	private final List<EuroMillionsBean> euroMillionsBeans = loadBean(CSV_EUROMILLIONS);
-
+	private final static Logger LOG = LoggerFactory.getLogger(RandomStatsServices.class);
 	public List<EuroMillionsBean> loadBean(final String csvFileName) {
 		List<EuroMillionsBean> beans = null;
 		try {
@@ -36,7 +36,7 @@ public class RandomStatsServices {
 						.parse();
 			return beans;
 		} catch (IllegalStateException e) {
-			log.error("Unable to parse or build the list of EuroMillionsBean", new RandomStatsException(e));
+			LOG.error("Unable to parse or build the list of EuroMillionsBean", new RandomStatsException(e));
 		} 
 		return beans;
 	}
@@ -54,7 +54,7 @@ public class RandomStatsServices {
 					)
 			);
 		} catch (IOException | URISyntaxException e) {
-			log.error("Unable to load '" + csvFileName + "'",  new RandomStatsException(e));
+			LOG.error("Unable to load '" + csvFileName + "'",  new RandomStatsException(e));
 		} 
 		return reader;
 	}
@@ -88,8 +88,8 @@ public class RandomStatsServices {
 		return RandomStatsUtils.statistics(beans == null ? euroMillionsBeans : beans, number, isOut, isStar);
 	}
 
-	public EuroMillionsPronosticsBean pronostics(List<EuroMillionsBean> beans) {
-		return RandomStatsUtils.pronostics(beans == null ? euroMillionsBeans : beans);
+	public EuroMillionsPronosticsBean pronostics(List<EuroMillionsBean> beans, long range) {
+		return RandomStatsUtils.pronostics(beans == null ? euroMillionsBeans : beans, range);
 	}
 
 }

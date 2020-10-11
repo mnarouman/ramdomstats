@@ -10,30 +10,32 @@ import java.util.stream.Collectors;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import lombok.extern.slf4j.Slf4j;
 import my.toolkit.randomstats.domain.EuroMillionsBean;
 import my.toolkit.randomstats.domain.EuroMillionsPronosticsBean;
 import my.toolkit.randomstats.domain.EuroMillionsStatsBean;
 import my.toolkit.randomstats.services.RandomStatsServices;
 import my.toolkit.randomstats.utils.RandomStatsUtils;
-@Slf4j
 @SpringBootTest
 public class RandomStatsTest {
+	private final static Logger LOG = LoggerFactory.getLogger(RandomStatsTest.class);
 	private static final String CSV_EUROMILLIONS_2020_09_18 = "csv/euromillions-2020-09-18.csv";
 	private static final String CSV_EUROMILLIONS_2020_09_22 = "csv/euromillions-2020-09-22.csv";
+	private static final String CSV_EUROMILLIONS_2020_10_09 = "csv/euromillions-2020-10-09-small.csv";
 	private static final String CSV_EUROMILLIONS = "csv/euromillions.csv";
 	private List<EuroMillionsBean> beans;
 	private List<EuroMillionsBean> beans20200922;
+	private List<EuroMillionsBean> beans20201009;
 	
 	private BiPredicate<Integer, EuroMillionsBean> isNumberOut = RandomStatsUtils.getIsNumberOut();
 	private BiPredicate<Integer, EuroMillionsBean> isStarOut = RandomStatsUtils.getIsStarOut();
 			
 	static {
 		System.setProperty("java.awt.headless", "false");
-		
 	}
 	
 	@Autowired
@@ -43,7 +45,8 @@ public class RandomStatsTest {
 	public void init() {
 		beans = services.loadBean(CSV_EUROMILLIONS);
 		beans20200922 = services.loadBean(CSV_EUROMILLIONS_2020_09_22);
-		log.debug("************ Number of draws :" + beans.size() );
+		beans20201009 = services.loadBean(CSV_EUROMILLIONS_2020_10_09);
+		LOG.debug("************ Number of draws :" + beans.size() );
 
 	}
 	
@@ -79,6 +82,23 @@ public class RandomStatsTest {
 	}
 	
 	/**
+	 * number of lottery draws where the number is not out
+	 * @throws Exception
+	 */
+	@Test
+	public void lastWinningDrawFor19() throws Exception {
+		// given
+		int number = 19;
+		
+		// when
+		long actualDeviation = services.lastWinningDraw(beans20201009, number, isNumberOut);
+
+		// then
+		Assertions.assertThat(actualDeviation).isEqualTo(11);
+		
+	}
+
+	/**
 	 * Recent average deviation over its last 20 outings.
 	 * @throws Exception
 	 */
@@ -92,9 +112,46 @@ public class RandomStatsTest {
 		float ponctualDeviation = services.winningDrawAverage(beans, number, nbDraws, isNumberOut);
 
 		// then
-		Assertions.assertThat(ponctualDeviation).isEqualTo(14.25f);
+		Assertions.assertThat(ponctualDeviation).isEqualTo(13.30f);
 		
 	}
+	
+	/**
+	 * Recent average deviation over its last 20 outings.
+	 * @throws Exception
+	 */
+	@Test
+	public void winningDrawAverageFor23InFirst20() throws Exception {
+		// given
+		int number = 23;
+		int nbDraws = 20;
+		
+		// when
+		float ponctualDeviation = services.winningDrawAverage(beans20201009, number, nbDraws, isNumberOut);
+
+		// then
+		Assertions.assertThat(ponctualDeviation).isEqualTo(2.50f);
+		
+	}
+	
+	/**
+	 * Recent average deviation over its last 20 outings.
+	 * @throws Exception
+	 */
+	@Test
+	public void winningDrawAverageFor15InFirst20() throws Exception {
+		// given
+		int number = 15;
+		int nbDraws = 20;
+		
+		// when
+		float ponctualDeviation = services.winningDrawAverage(beans20201009, number, nbDraws, isNumberOut);
+
+		// then
+		Assertions.assertThat(ponctualDeviation).isEqualTo(3.00f);
+		
+	}
+
 	
 	/**
 	 * Recent average deviation over its last 20 outings.
@@ -110,7 +167,7 @@ public class RandomStatsTest {
 		float ponctualDeviation = services.winningDrawAverage(beans, number, nbDraws, isNumberOut);
 
 		// then
-		Assertions.assertThat(ponctualDeviation).isEqualTo(7.75f);
+		Assertions.assertThat(ponctualDeviation).isEqualTo(6.80f);
 		
 	}
 	
@@ -161,7 +218,24 @@ public class RandomStatsTest {
 		int maxDeviation = services.maxBeforeWinningDraw(beans, number, isNumberOut);
 
 		// then
-		Assertions.assertThat(maxDeviation).isEqualTo(58);
+		Assertions.assertThat(maxDeviation).isEqualTo(57);
+		
+	}
+	
+	/**
+	 * Maximum number of draws during which the number was delayed
+	 * @throws Exception
+	 */
+	@Test
+	public void maximumBeforeWinningDrawFor15InFirst20() throws Exception {
+		// given
+		int number = 15;
+		
+		// when
+		int maxDeviation = services.maxBeforeWinningDraw(beans20201009, number, isNumberOut);
+
+		// then
+		Assertions.assertThat(maxDeviation).isEqualTo(5);
 		
 	}
 	
@@ -174,7 +248,7 @@ public class RandomStatsTest {
 		int maxDeviation = services.maxBeforeWinningDraw(beans, number, isNumberOut);
 
 		// then
-		Assertions.assertThat(maxDeviation).isEqualTo(76);
+		Assertions.assertThat(maxDeviation).isEqualTo(75);
 		
 	}
 
@@ -193,6 +267,24 @@ public class RandomStatsTest {
 
 		// then
 		Assertions.assertThat(appearances).isEqualTo(1);
+		
+	}
+	
+	/**
+	 * number of times the number appeared on the last 10 draws
+	 * @throws Exception
+	 */
+	@Test
+	public void recentAppearancesFor2() throws Exception {
+		// given
+		int number = 2;
+		int numberOfDraws = 5;
+		
+		// when
+		int appearances = services.numberOfTimesWinningOnNDraws(beans20201009, number, numberOfDraws, isNumberOut);
+
+		// then
+		Assertions.assertThat(appearances).isEqualTo(2);
 		
 	}
 	
@@ -228,7 +320,7 @@ public class RandomStatsTest {
 		int appearances = services.numberOfTimesWinningOnNDraws(beans, number, numberOfDraws, isStarOut);
 
 		// then
-		Assertions.assertThat(appearances).isEqualTo(7);
+		Assertions.assertThat(appearances).isEqualTo(6);
 		
 	}
 	
@@ -247,10 +339,10 @@ public class RandomStatsTest {
 		// then
 		Assertions.assertThat(stats.getNumber()).isEqualTo(22);
 		Assertions.assertThat(stats.getLastWinningDraw()).isEqualTo(5);
-		Assertions.assertThat(stats.getWinningDrawAverage()).isEqualTo(14.25f);
+		Assertions.assertThat(stats.getWinningDrawAverage()).isEqualTo(13.30f);
 		Assertions.assertThat(stats.getNumberOfTimesWinning()).isEqualTo(116);	
 		Assertions.assertThat(String.format("%.2f", stats.getOutputFrequency())).isEqualTo("0,09");
-		Assertions.assertThat(stats.getMaxBeforeWinningDraw()).isEqualTo(58);
+		Assertions.assertThat(stats.getMaxBeforeWinningDraw()).isEqualTo(57);
 		Assertions.assertThat(stats.getNumberOfTimesWinningOn10Draws()).isEqualTo(1);
 		Assertions.assertThat(stats.getNumberOfTimesWinningOn30Draws()).isEqualTo(2);
 	}
@@ -270,10 +362,10 @@ public class RandomStatsTest {
 		// then
 		Assertions.assertThat(stats.getNumber()).isEqualTo(10);
 		Assertions.assertThat(stats.getLastWinningDraw()).isEqualTo(1);
-		Assertions.assertThat(stats.getWinningDrawAverage()).isEqualTo(9.65f);
+		Assertions.assertThat(stats.getWinningDrawAverage()).isEqualTo(8.70f);
 		Assertions.assertThat(stats.getNumberOfTimesWinning()).isEqualTo(146);	
 		Assertions.assertThat(String.format("%.2f", stats.getOutputFrequency())).isEqualTo("0,11");
-		Assertions.assertThat(stats.getMaxBeforeWinningDraw()).isEqualTo(39);
+		Assertions.assertThat(stats.getMaxBeforeWinningDraw()).isEqualTo(38);
 		Assertions.assertThat(stats.getNumberOfTimesWinningOn10Draws()).isEqualTo(3);
 		Assertions.assertThat(stats.getNumberOfTimesWinningOn30Draws()).isEqualTo(5);
 	}
@@ -293,12 +385,12 @@ public class RandomStatsTest {
 		// then
 		Assertions.assertThat(stats.getNumber()).isEqualTo(2);
 		Assertions.assertThat(stats.getLastWinningDraw()).isEqualTo(15);
-		Assertions.assertThat(stats.getWinningDrawAverage()).isEqualTo(4.50f);
+		Assertions.assertThat(stats.getWinningDrawAverage()).isEqualTo(3.55f);
 		Assertions.assertThat(stats.getNumberOfTimesWinning()).isEqualTo(280);	
 		Assertions.assertThat(String.format("%.2f", stats.getOutputFrequency())).isEqualTo("0,21");
-		Assertions.assertThat(stats.getMaxBeforeWinningDraw()).isEqualTo(29);
+		Assertions.assertThat(stats.getMaxBeforeWinningDraw()).isEqualTo(28);
 		Assertions.assertThat(stats.getNumberOfTimesWinningOn10Draws()).isEqualTo(0);
-		Assertions.assertThat(stats.getNumberOfTimesWinningOn30Draws()).isEqualTo(7);
+		Assertions.assertThat(stats.getNumberOfTimesWinningOn30Draws()).isEqualTo(6);
 	}
 	
 	/**
@@ -316,10 +408,10 @@ public class RandomStatsTest {
 		// then
 		Assertions.assertThat(stats.getNumber()).isEqualTo(10);
 		Assertions.assertThat(stats.getLastWinningDraw()).isEqualTo(8);
-		Assertions.assertThat(stats.getWinningDrawAverage()).isEqualTo(7.10f);
+		Assertions.assertThat(stats.getWinningDrawAverage()).isEqualTo(6.15f);
 		Assertions.assertThat(stats.getNumberOfTimesWinning()).isEqualTo(179);	
 		Assertions.assertThat(String.format("%.2f", stats.getOutputFrequency())).isEqualTo("0,13");
-		Assertions.assertThat(stats.getMaxBeforeWinningDraw()).isEqualTo(29);
+		Assertions.assertThat(stats.getMaxBeforeWinningDraw()).isEqualTo(28);
 		Assertions.assertThat(stats.getNumberOfTimesWinningOn10Draws()).isEqualTo(1);
 		Assertions.assertThat(stats.getNumberOfTimesWinningOn30Draws()).isEqualTo(5);
 	}
@@ -339,9 +431,10 @@ public class RandomStatsTest {
 	@Test
 	public void pronostics() throws Exception {
 		//given
+		long range = 20L;
 		
 		//when
-		EuroMillionsPronosticsBean pronostics = services.pronostics(beans);
+		EuroMillionsPronosticsBean pronostics = services.pronostics(beans, range);
 		
 		//then
 		assertThat(pronostics.getAllStats()).isNotNull();

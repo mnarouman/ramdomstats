@@ -33,3 +33,7 @@ build/
 .vscode/
 docs/LotoAnalyseDocV800.pdf
 **/.~lock*
+
+euromillions-2020-09-22.csv
+euromillions-2020-09-22.xlsx
+euromillions-2020-09-29.xlsx
