@@ -11,9 +11,9 @@
 	</parent>
 	<groupId>my.toolkit</groupId>
 	<artifactId>random-stats</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.1</version>
 	<name>random-stats</name>
-	<description>Demo project for Spring Boot</description>
+	<description>Entertainment with stats</description>
 
 	<properties>
 		<java.version>11</java.version>
@@ -140,5 +140,24 @@
 			</plugin>
 		</plugins>
 	</build>
+	<distributionManagement>
+		<repository>
+			<id>mnafeed01</id>
+			<name>mnafeed01</name>
+			<url>https://pkgs.dev.azure.com/mnaazurefree/randomstats/_packaging/mnafeed01/maven/v1</url>
+		</repository>
+	</distributionManagement>
+	<repositories>
+		<repository>
+		  <id>mnafeed01</id>
+		  <url>https://pkgs.dev.azure.com/mnaazurefree/randomstats/_packaging/mnafeed01/maven/v1</url>
+		  <releases>
+		    <enabled>true</enabled>
+		  </releases>
+		  <snapshots>
+		    <enabled>true</enabled>
+		  </snapshots>
+		</repository>
+	</repositories>
 
 </project>
