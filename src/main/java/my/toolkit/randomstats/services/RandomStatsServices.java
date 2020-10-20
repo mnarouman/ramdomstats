@@ -91,5 +91,13 @@ public class RandomStatsServices {
 	public EuroMillionsPronosticsBean pronostics(List<EuroMillionsBean> beans, long range) {
 		return RandomStatsUtils.pronostics(beans == null ? euroMillionsBeans : beans, range);
 	}
+	
+	public List<EuroMillionsBean> getLastNDraws(List<EuroMillionsBean> beans, int numberOfWeeks) {
+		return RandomStatsUtils.getLastNDraws(beans == null ? euroMillionsBeans : beans, numberOfWeeks);
+	}
+
+	public List<Integer> getLast10ColdNumbers(List<EuroMillionsBean> beans, int numberOfWeeks) {
+		return RandomStatsUtils.getLast10ColdNumbers(beans == null ? euroMillionsBeans : beans, numberOfWeeks);
+	}
 
 }

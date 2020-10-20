@@ -1,9 +1,13 @@
 package my.toolkit.randomstats.utils;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Comparator;
 import java.util.List;
 import java.util.OptionalDouble;
+import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
+import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -72,7 +76,7 @@ public class RandomStatsUtils {
 	 * @return
 	 */
 	public static float winningDrawAverage(List<EuroMillionsBean> euroMillionsBeans, int number, int nbDraws, BiPredicate<Integer, EuroMillionsBean> isOut) {
-		final int total = euroMillionsBeans.size();
+		final int total = euroMillionsBeans.stream().map(bean -> bean.getNum()).max(Comparator.naturalOrder()).get();
 		List<Integer> ponctualDeviations = new ArrayList<>();
 		int current = -1;
 		EuroMillionsBean last = null;
@@ -232,5 +236,31 @@ public class RandomStatsUtils {
 		allStats.addAll(allStarsStats(euroMillionsBeans));
 		return allStats;
 	}
+	
+	private final static  BiFunction<Calendar, Calendar, Long> dayDiff = (Calendar c1, Calendar c2) -> {
+		long date2 = c2.getTime().getTime();
+		long date1 = c1.getTime().getTime();
+		long dateDiff = Math.abs(date2 - date1);
+		long convertInDay = TimeUnit.DAYS.convert(dateDiff, TimeUnit.MILLISECONDS);
+		return convertInDay;
+	};
+
+	public static List<EuroMillionsBean> getLastNDraws(List<EuroMillionsBean> beans, int numberOfWeeks) {
+		Calendar currentDate = Calendar.getInstance(TimeZone.getDefault());
+
+		List<EuroMillionsBean> listOfDrawsDuringTheLastXWeeks = beans.stream()
+												.filter(bean -> {
+													return dayDiff.apply(currentDate, bean.getDate()) <= (numberOfWeeks * 7) ;
+												} )
+												.collect(Collectors.toList());
+		return listOfDrawsDuringTheLastXWeeks;
+	}
+
+	public static List<Integer> getLast10ColdNumbers(List<EuroMillionsBean> beans, int numberOfWeeks) {
+		return IntStream.of(1,2,3,4,5)
+	            .boxed()
+	            .collect(Collectors.toList());
+	}
+
 }
 

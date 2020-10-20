@@ -22,7 +22,7 @@ Les numéros les moins attendus : les tout derniers numéros qui ont été tiré
 top 3 des numéros et des étoiles les plus souvent sorties (numéros + nb de fois sortie)
 top 3 des numéros Euromillions et des étoiles les moins souvent tombés
 
-Le fichier d'entrée est construit comme suit:
+Le fichier d'entrée est construit comme suit (https://www.loterieplus.com/euromillions/services/telechargement-resultat.php) : 
 ----------------|-------------------------------------------------------------------------------|---------------------------|
 Nom du champ 	|Description 																	|Format						|
 ----------------|-------------------------------------------------------------------------------|---------------------------|
