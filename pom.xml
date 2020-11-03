@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>my.toolkit</groupId>
 	<artifactId>random-stats</artifactId>
-	<version>1.0.1</version>
+	<version>1.0.2</version>
 	<name>random-stats</name>
 	<description>Entertainment with stats</description>
 
